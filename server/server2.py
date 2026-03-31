@@ -104,3 +104,7 @@ def list_events(limit: int = 20):
     rows = [dict(row) for row in cur.fetchall()]
     conn.close()
     return rows
+
+@app.get("/api/health")
+def health():
+    return {"service": "buman-server", "ok": True}
