@@ -1,349 +1,108 @@
-# Acoustic AI Node / Nodo de IA Acústica
 
-## Español
+## BUMAN: Advanced Acoustic Surveillance Node## Automated UAV Detection, Signal Classification & Tactical Localization
+BUMAN (inspired by the Owl-Man) is a high-precision acoustic intelligence framework engineered to detect, classify, and localize aerial threats—specifically UAV drone motors. Much like an owl’s predatory precision, BUMAN monitors the acoustic spectrum to identify unique frequency signatures of drone propulsion systems within complex, high-noise environments.
+------------------------------
+## 1. System Architecture
+BUMAN is architected for modularity, allowing seamless transitions from research environments to edge-computing hardware (Raspberry Pi, NVIDIA Jetson, or ARM-based SBCs).
 
-### Descripción
+buman/
+├── config/              # Feature extraction thresholds & DSP parameters
+├── data/                # Dataset Management
+│   ├── predict/         # Unlabeled samples for real-time inference
+│   ├── test/            # Validation: /ambient/ vs /drone_motors/
+│   └── train/           # Training: /ambient/ vs /drone_motors/
+├── logs/                # System execution & tactical detection logs
+├── models/              # Exported Classifiers (.joblib / .pkl)
+├── scripts/             # Data augmentation & hardware utility scripts
+├── src/                 # Core Logic
+│   ├── main.py          # Application entry point & orchestration
+│   ├── prepare_data.py  # DSP Pipeline: MFCC & Spectral feature extraction
+│   ├── train_model.py   # Machine Learning pipeline (SVM/RandomForest)
+│   └── predict.py       # Inference engine, Geo-location & Alert logic
+├── systemd/             # Linux service files for 24/7 persistent monitoring
+├── .gitignore           
+├── README.md            
+└── requirements.txt     
 
-**Acoustic AI Node** es un proyecto de clasificación acústica basado en Python, diseñado para entrenar un modelo capaz de distinguir entre sonido ambiente y un sonido objetivo de drone shahead usando archivos de audio `.wav`.
+------------------------------
+## 2. Technical Specifications## Core Engine
 
-En esta primera etapa, el sistema:
+* Signal Processing: Librosa & Soundfile for high-fidelity Mel-frequency cepstral coefficients (MFCCs) and spectral analysis.
+* Machine Learning: Scikit-learn supervised classifiers (SVM / Random Forest) optimized for low-latency inference.
+* Geospatial: Integration for NMEA-compatible GPS modules to provide node positioning.
+* Acoustics: Support for multi-mic arrays to calculate Direction of Arrival (DoA).
 
-* organiza audios por clases,
-* extrae características acústicas,
-* entrena un modelo de machine learning,
-* y realiza predicciones sobre nuevos audios.
+## Detection DNA
+BUMAN analyzes specific acoustic markers to ensure high confidence and low false-positive rates:
 
-Más adelante, el proyecto podrá evolucionar hacia:
+* Spectral Centroid: Identifies the "center of mass" of the frequency spectrum.
+* Harmonic-to-Noise Ratio (HNR): Differentiates mechanical motor humming from chaotic wind/rain noise.
+* Chroma Features: Analyzes the tonal content unique to specific drone rotors.
 
-* detección en tiempo real con micrófono,
-* ejecución en Raspberry Pi,
-* despliegue como nodo autónomo,
-* y envío de alertas.
+------------------------------
+## 3. Implementation & Deployment## I. Installation
+Ensure your environment meets the Python 3.10+ requirement.
 
----
-
-### Objetivo
-
-Construir una base sólida para un sistema de reconocimiento acústico que permita detectar un sonido objetivo dentro de ruido ambiental.
-
----
-
-### Estado actual del proyecto
-
-Actualmente el proyecto incluye:
-
-* preparación de datos de audio,
-* extracción de features,
-* entrenamiento de un modelo,
-* predicción sobre archivos nuevos.
-
----
-
-### Estructura del proyecto
-
-```
-acoustic-ai-node/
-│
-├── data/
-│   ├── train/
-│   │   ├── ambiente/
-│   │   └── motor_objetivo/
-│   ├── test/
-│   │   ├── ambiente/
-│   │   └── motor_objetivo/
-│   └── predict/
-│
-├── models/
-├── src/
-│   ├── prepare_data.py
-│   ├── train_model.py
-│   ├── predict.py
-│   └── main.py
-│
-├── config/
-├── logs/
-├── scripts/
-├── systemd/
-├── requirements.txt
-├── .gitignore
-└── README.md
-```
-
----
-
-### Requisitos
-
-* Python 3.10 o superior
-* pip
-* Visual Studio Code recomendado
-
----
-
-### Instalación
-
-```
+# Clone the repository
+git clone https://github.com
+cd buman
+# Install core dependencies
 pip install -r requirements.txt
-```
 
----
+## II. Data Configuration
+Populate the data/ directories with .wav samples:
+
+* data/train/ambient/: Wind, rain, traffic, birds, urban white noise.
+* data/train/drone_motors/: Targeted recordings of various UAV motor signatures.
+
+## III. Execution Pipeline
+
+   1. Model Training: Processes raw audio and generates a serialized classifier.
+   
+   python src/train_model.py
+   
+   2. Inference & Prediction: Executes the detection engine on new samples.
+   
+   python src/predict.py
+   
+   
+------------------------------
+## 4. Tactical Telemetry (JSON Output)
+BUMAN generates standardized telemetry for integration with Tactical Maps (GIS), SOC dashboards, or ATAK (Android Tactical Assault Kit).
+
+{
+  "timestamp": "2024-05-20T14:30:05Z",
+  "node_id": "BUMAN-01",
+  "prediction": "drone_motors",
+  "confidence_score": 0.92,
+  "status": "CRITICAL_ALERT",
+  "action": "TARGET_DETECTED",
+  "location": {
+    "latitude": 40.7128,
+    "longitude": -74.0060,
+    "altitude_m": 12.5,
+    "description": "Stationary Node Alpha"
+  },
+  "bearing": {
+    "azimuth_deg": 145.2,
+    "elevation_deg": 15.0,
+    "direction": "SE"
+  }
+}
+
+------------------------------
+## 5. Development Roadmap
+
+* [ ] Real-time Stream Inference: Continuous analysis via PyAudio integration.
+* [ ] DoA Calculation: Implementation of Time Difference of Arrival (TDoA) for 360° bearing detection.
+* [ ] Edge Quantization: Porting models to TensorFlow Lite for ultra-low power consumption.
+* [ ] Distributed Mesh: Networking multiple BUMAN nodes to triangulate target coordinates via cross-bearing analysis.
+
+------------------------------
+## 6. Security & Ethics
+This framework is intended for defensive security research and environmental monitoring. Users are responsible for ensuring compliance with local laws regarding acoustic data collection and privacy.
+------------------------------
+## 7. Organization
+Managed by CYBER-TICS. Focused on developing autonomous solutions for the modern technological landscape.
 
-### Dependencias principales
 
-* numpy
-* librosa
-* scikit-learn
-* joblib
-* soundfile
-
----
-
-### Organización de datos
-
-Los audios deben almacenarse en formato `.wav`.
-
-#### Entrenamiento
-
-* `data/train/ambiente/`
-* `data/train/motor_objetivo/`
-
-#### Pruebas
-
-* `data/test/ambiente/`
-* `data/test/motor_objetivo/`
-
-#### Predicción
-
-* `data/predict/`
-
----
-
-### Flujo de trabajo
-
-#### 1. Preparar dataset
-
-Colocar audios en las carpetas correspondientes.
-
-#### 2. Entrenar el modelo
-
-```
-python src/train_model.py
-```
-
-#### 3. Ejecutar predicción
-
-```
-python src/predict.py
-```
-
----
-
-### Salida esperada
-
-```
-Archivo: ejemplo.wav
-Clase predicha: motor_objetivo
-Confianza: 0.87
-⚠️ ALERTA: sonido objetivo detectado
-```
-
-o
-
-```
-Archivo: ejemplo.wav
-Clase predicha: ambiente
-Confianza: 0.91
-✅ Sonido ambiente normal
-```
-
----
-
-### Próximos pasos
-
-* aumentar dataset de entrenamiento
-* mejorar calidad y variedad de audios
-* evaluar precisión del modelo
-* incorporar grabación por micrófono
-* implementar inferencia en tiempo real
-* preparar despliegue en Raspberry Pi
-
----
-
-### Notas
-
-Este proyecto se encuentra en fase temprana de prototipo.
-La calidad del modelo dependerá directamente de la calidad, cantidad y diversidad del dataset de audio.
-
----
-
-## English
-
-### Description
-
-**Acoustic AI Node** is a Python-based acoustic classification project designed to train a model capable of distinguishing between background sound and a target drone shahead motor sound using `.wav` audio files.
-
-At this first stage, the system:
-
-* organizes audio samples by class,
-* extracts acoustic features,
-* trains a machine learning model,
-* and performs predictions on new audio files.
-
-Later, the project may evolve into:
-
-* real-time microphone detection
-* Raspberry Pi deployment
-* autonomous field node execution
-* alert generation
-
----
-
-### Objective
-
-Build a solid foundation for an acoustic recognition system able to detect a target sound in noisy environments.
-
----
-
-### Current project status
-
-The project currently includes:
-
-* audio data preparation
-* feature extraction
-* model training
-* prediction on new audio files
-
----
-
-### Project structure
-
-```
-acoustic-ai-node/
-│
-├── data/
-│   ├── train/
-│   │   ├── ambiente/
-│   │   └── motor_objetivo/
-│   ├── test/
-│   │   ├── ambiente/
-│   │   └── motor_objetivo/
-│   └── predict/
-│
-├── models/
-├── src/
-│   ├── prepare_data.py
-│   ├── train_model.py
-│   ├── predict.py
-│   └── main.py
-│
-├── config/
-├── logs/
-├── scripts/
-├── systemd/
-├── requirements.txt
-├── .gitignore
-└── README.md
-```
-
----
-
-### Requirements
-
-* Python 3.10 or higher
-* pip
-* Visual Studio Code recommended
-
----
-
-### Installation
-
-```
-pip install -r requirements.txt
-```
-
----
-
-### Main dependencies
-
-* numpy
-* librosa
-* scikit-learn
-* joblib
-* soundfile
-
----
-
-### Data organization
-
-Audio files should be stored in `.wav` format.
-
-#### Training
-
-* `data/train/ambiente/`
-* `data/train/motor_objetivo/`
-
-#### Testing
-
-* `data/test/ambiente/`
-* `data/test/motor_objetivo/`
-
-#### Prediction
-
-* `data/predict/`
-
----
-
-### Workflow
-
-#### 1. Prepare dataset
-
-Place audio files into the corresponding folders.
-
-#### 2. Train the model
-
-```
-python src/train_model.py
-```
-
-#### 3. Run prediction
-
-```
-python src/predict.py
-```
-
----
-
-### Expected output
-
-```
-Archivo: ejemplo.wav
-Clase predicha: motor_objetivo
-Confianza: 0.87
-⚠️ ALERTA: sonido objetivo detectado
-```
-
-or
-
-```
-Archivo: ejemplo.wav
-Clase predicha: ambiente
-Confianza: 0.91
-✅ Sonido ambiente normal
-```
-
----
-
-### Next steps
-
-* expand the training dataset
-* improve audio quality and diversity
-* evaluate model accuracy
-* add microphone input
-* implement real-time inference
-* prepare Raspberry Pi deployment
-
----
-
-### Notes
-
-This project is currently in an early prototype stage.
-Model quality will strongly depend on the quality, quantity, and diversity of the audio dataset.
