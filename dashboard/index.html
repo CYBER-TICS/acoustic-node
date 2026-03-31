@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NARCOMA COMAND - Acoustic AI Dashboard</title>
+  
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <h2 class="page-title" >NARCMA COMAND</h2>
+    <audio id="alarm-sound" src="alarm.wav" preload="auto"></audio>
+
+  <div class="dashboard-shell">
+    <div class="top-panel">
+      <div class="top-grid">
+        <div class="top-left">
+          <div class="dashboard-title">Acoustic AI Dashboard</div>
+          <div class="subtitle">Live event monitor - UAE Standard Time (GST)</div>
+
+          <div class="topbar">
+            <button class="refresh-btn" onclick="loadEvents()">Refresh</button>
+            <input type="date" id="dateFilter" onchange="filterByDate()" />
+            <button class="clear-btn" onclick="clearDateFilter()">Show All</button>
+
+            <label class="topbar-label" for="limitSelect">Show</label>
+            <select id="limitSelect" onchange="changeLimit(this.value)">
+              <option value="10">10</option>
+              <option value="20" selected>20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="top-right">
+          <div class="top-right-title">SYSTEM STATUS</div>
+          <div style="margin-top: 15px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+            <button
+              id="inventory-toggle"
+              onclick="toggleInventory()"
+              style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;"
+            >
+              VIEW NODE REPOSITORY
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="inventory-panel" class="inventory-hidden">
+      <div class="inventory-header">
+        <h3 style="margin:0; font-size: 14px; color: #f8fafc;">NODE REPOSITORY (GST)</h3>
+        <button
+          onclick="toggleInventory()"
+          style="background:none; border:none; color:#94a3b8; font-size: 24px; cursor:pointer;"
+        >
+          &times;
+        </button>
+      </div>
+
+      <div id="nodes-list-content">
+        <p style="color: #94a3b8; font-size: 12px; text-align: center;">Scanning nodes...</p>
+      </div>
+    </div>
+
+    <div class="main-layout">
+      <div class="left-panel">
+        <h2 class="section-title">Event Information (Alerts Only)</h2>
+
+        <div class="stats">
+          <div class="stat-box">
+            <div class="stat-title">Total Events</div>
+            <div class="stat-value" id="total-events">0</div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-title">Active Alerts</div>
+            <div class="stat-value" id="active-alerts">0</div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-title">Resolved Events</div>
+            <div class="stat-value" id="resolved-events">0</div>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Node</th>
+                <th>Time (GST)</th>
+                <th>Coordinates</th>
+                <th>Class</th>
+                <th>Conf.</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="events-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <h2 class="section-title">Tactical Map</h2>
+
+        <div class="map-wrapper">
+          <div id="map"></div>
+        </div>
+
+        <div class="map-controls">
+          <div class="map-controls-title">Map Controls</div>
+          <div class="map-controls-grid">
+            <button class="map-btn" onclick="setStreetView()">Street</button>
+            <button class="map-btn" onclick="setSatelliteView()">Satellite</button>
+            <button class="map-btn" onclick="resetMapView()">Reset View</button>
+            <button class="map-btn" onclick="focusLatestAlert()">Focus Alert</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

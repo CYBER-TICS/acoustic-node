@@ -1,0 +1,8 @@
+numpy
+librosa
+scikit-learn
+joblib
+soundfile
+sounddevice
+requests
+python-dotenv
